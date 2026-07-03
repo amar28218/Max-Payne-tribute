@@ -15,8 +15,8 @@ import { sfx } from "@/lib/sfx-manager"
  * ===========================================================================
  */
 const BOOT_LINES = [
-  "EDIT_ME: first narration line goes here.",
-  "EDIT_ME: second narration line goes here.",
+  "They were all dead.",
+  "The Final gunshot was an exclamation mark to everything.....",
 ]
 
 type Stage = "idle" | "flash" | "typing" | "glitch" | "done"
