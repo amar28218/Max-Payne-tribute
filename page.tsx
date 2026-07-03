@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { StoryBeatTrigger } from "@/components/noir/story-beat-trigger"
 import { BootSequence } from "@/components/noir/boot-sequence"
 import { NoirCursor } from "@/components/noir/cursor-system"
 import { TiltCard } from "@/components/noir/tilt-card"
@@ -26,66 +27,69 @@ import {
 } from "@/components/noir/interactions"
 
 // Character data for dossier system
+// NOTE: names and locations are drawn from Max Payne (2001). All quotes and
+// evidence text below are original writing for this tribute — not lines
+// from the game's script.
 const CHARACTERS: Character[] = [
   {
-    id: "marcus",
-    name: "MARCUS COLE",
-    role: "The Detective",
-    description: "Former NCPD detective turned vigilante. They broke him once in the warehouse district. He won't break again. His wife Sarah was the first victim of Crane's expansion into the docks.",
-    stats: { strength: 85, intellect: 92, will: 78 },
-    quote: "\"Justice isn't blind. It just learned to see in the dark.\"",
+    id: "max",
+    name: "MAX PAYNE",
+    role: "The Vigilante",
+    description: "Former NYPD, later undercover DEA. His wife and infant daughter were murdered in their apartment while he was still on the force. Three years later, framed for a killing he didn't commit, he went underground — and started pulling on the thread that led to Aesir.",
+    stats: { strength: 80, intellect: 85, will: 96 },
+    quote: "\"I stopped believing in happy endings a long time ago. I just wanted the ending to mean something.\"",
     evidence: [
-      { title: "Badge", content: "NCPD Badge #4471. Surrendered under duress, 1947. Disciplinary notes: Excessive force, insubordination." },
-      { title: "Letter", content: "A water-damaged letter from Sarah. \"Whatever happens, remember why you became a cop. Remember who you are.\"" },
-      { title: "Bullet", content: "A single .45 round, kept in his pocket. \"The last one's always for me, if it comes to that.\"" },
+      { title: "Badge", content: "NYPD badge, surrendered years ago. Kept anyway. Some habits don't break clean." },
+      { title: "Photograph", content: "A photo of Michelle and Rose, creased from being folded and unfolded too many times." },
+      { title: "Case Notes", content: "Handwritten notes on a drug called Valkyr, and a company called Aesir that shouldn't have a reason to know his name." },
     ],
-    connections: ["elena", "crane", "razzo"],
-    redactedWords: ["warehouse", "sarah", "docks"],
+    connections: ["mona", "horne", "lupino"],
+    redactedWords: ["michelle", "rose", "valkyr"],
   },
   {
-    id: "elena",
-    name: "ELENA VANCE",
-    role: "The Femme Fatale",
-    description: "Singer at the Black Rose nightclub. She knows everyone's secrets, including the location of Crane's ledger. Her brother disappeared investigating the harbor smuggling operation.",
-    stats: { strength: 45, intellect: 88, will: 95 },
-    quote: "\"Every man has a price. Most just don't know it yet.\"",
+    id: "mona",
+    name: "MONA SAX",
+    role: "The Contract Killer",
+    description: "A sniper with no fixed employer and no fixed loyalty — except, maybe, to her sister's memory. Lisa died in circumstances that trace back to the same people Max is hunting. Mona keeps showing up at the worst possible moments, always with a rifle and never with a clear answer about whose side she's on.",
+    stats: { strength: 58, intellect: 82, will: 90 },
+    quote: "\"You keep assuming I'm here to save you. I'm here for my own reasons. Yours just happen to overlap.\"",
     evidence: [
-      { title: "Photograph", content: "Elena and her brother Michael, 1945. He was a reporter. He asked too many questions about the harbor." },
-      { title: "Key", content: "A safe deposit key, Bank of Noir City. Box 442. Contents: insurance against powerful men." },
-      { title: "Recording", content: "A wax cylinder recording of a conversation between Crane and the Commissioner. Leverage for survival." },
+      { title: "Rifle Scope", content: "A cracked scope lens. Whatever she was watching through it, it clearly didn't go to plan." },
+      { title: "Photograph", content: "Two sisters, younger, on a rooftop somewhere. Only one of them is still alive to remember it." },
+      { title: "Note", content: "Unsigned, in careful handwriting: \"Don't trust Aesir. Don't trust anyone who works for them either.\"" },
     ],
-    connections: ["marcus", "crane"],
-    redactedWords: ["ledger", "harbor", "commissioner"],
+    connections: ["max", "lupino"],
+    redactedWords: ["lisa", "rooftop", "sister"],
   },
   {
-    id: "crane",
-    name: "VICTOR CRANE",
+    id: "horne",
+    name: "NICOLE HORNE",
     role: "The Kingpin",
-    description: "Owns half the city and wants the rest. Bodies are just paperwork to him. Rose from the tenements to control the docks, gambling, and the police. His only weakness is his daughter Isabella.",
-    stats: { strength: 60, intellect: 95, will: 99 },
-    quote: "\"This city? It's been mine since before you were born.\"",
+    description: "CEO of Aesir Corporation. Publicly, a pharmaceutical executive. Privately, the architect of Valkyr — a drug that made it onto the street and into a lot of very bad decisions, including, indirectly, the night Max's family died. She has never once raised her voice about any of it.",
+    stats: { strength: 30, intellect: 98, will: 99 },
+    quote: "\"I don't deal in guilt. Guilt is for people who didn't think far enough ahead.\"",
     evidence: [
-      { title: "Ledger Page", content: "A torn page showing payments to judges, councilmen, and the Chief of Police. Monthly. Without fail." },
-      { title: "Photograph", content: "Victor with Isabella at her graduation. The only photo where he's smiling. His one vulnerability." },
-      { title: "Telegram", content: "\"The shipment arrives Tuesday. Ensure the Harbor Master is cooperative. -V\" Dated one week before Michael Vance disappeared." },
+      { title: "Internal Memo", content: "\"Field testing of Compound V is proceeding ahead of schedule. Containment of the distribution leak is priority one.\"" },
+      { title: "Shipping Manifest", content: "Aesir Corporation crates, routed through three shell companies before reaching Ragna Rock." },
+      { title: "Photograph", content: "Horne at a product launch, smiling for the press. Taken the same week the leak reached the street." },
     ],
-    connections: ["elena", "razzo", "marcus"],
-    redactedWords: ["isabella", "docks", "police"],
+    connections: ["lupino", "max"],
+    redactedWords: ["aesir", "valkyr", "compound"],
   },
   {
-    id: "razzo",
-    name: "JOHNNY RAZZO",
+    id: "lupino",
+    name: "JACK LUPINO",
     role: "The Enforcer",
-    description: "Crane's right hand and personal executioner. What he lacks in brains, he makes up for in brutality. Former boxer from the waterfront. Owes Crane everything since the fire that killed his family.",
-    stats: { strength: 98, intellect: 35, will: 70 },
-    quote: "\"Boss says you gotta go. Nothing personal.\"",
+    description: "Runs Ragna Rock and whatever's left of the old mob muscle that hasn't been absorbed by Aesir's money. Deep into his own supply of Valkyr, which has made him unpredictable even by the standards of men who solve problems with guns. Nobody's sure anymore whether he's protecting Horne's operation or just barely holding himself together.",
+    stats: { strength: 95, intellect: 42, will: 55 },
+    quote: "\"You want to talk business? Fine. Talk fast. The walls have started talking back to me.\"",
     evidence: [
-      { title: "Boxing Gloves", content: "Won the Harbor District Championship, 1942. Undefeated in 23 fights. Then his hands became tools for darker work." },
-      { title: "Newspaper", content: "\"WATERFRONT FIRE KILLS FIVE\" - Including Johnny's wife and son. Ruled accidental. Crane paid off the investigators." },
-      { title: "List", content: "Names in Johnny's handwriting. Crossed out, one by one. Marcus Cole's name is near the bottom. Not yet crossed." },
+      { title: "Club Ledger", content: "Ragna Rock's books, half legitimate. The other half is written in a code nobody's cracked yet." },
+      { title: "Prescription Bottle", content: "No label. No pharmacy stamp. Empty." },
+      { title: "Torn Note", content: "\"They're not made anymore, they're just angels\" — scrawled over and over on the same page." },
     ],
-    connections: ["crane", "marcus"],
-    redactedWords: ["fire", "waterfront", "family"],
+    connections: ["horne", "max", "mona"],
+    redactedWords: ["ragna", "valkyr", "angels"],
   },
 ]
 
@@ -112,20 +116,20 @@ function HeroSection() {
       )}>
         {/* Subtitle */}
         <p className="font-mono text-primary text-sm md:text-base tracking-[0.3em] mb-4 uppercase">
-          A Graphic Novel Experience
+          An Unofficial Fan Tribute
         </p>
         
         {/* Main title with interactive letters */}
         <h1 className="font-sans text-7xl md:text-9xl lg:text-[12rem] leading-none tracking-tight text-shadow-noir mb-6">
-          <InteractiveTitle text="NOIR" className="block" />
+          <InteractiveTitle text="MAX" className="block" />
           <span className="block text-primary">
-            <InteractiveTitle text="CITY" />
+            <InteractiveTitle text="PAYNE" />
           </span>
         </h1>
         
         {/* Tagline */}
         <p className="font-serif text-xl md:text-2xl text-muted-foreground italic max-w-2xl mx-auto mb-12">
-          {"\"In a city drowning in rain and sin, one man's quest for vengeance becomes everyone's nightmare.\""}
+          {"\"New York, 1998. The rain doesn't stop for anyone's grief. It just makes the walk longer.\""}
         </p>
 
         {/* CTA */}
@@ -133,7 +137,7 @@ function HeroSection() {
           className="group relative inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg tracking-widest transition-all duration-300 hover:shadow-[0_0_30px_rgba(220,38,38,0.4)]"
           data-clickable
         >
-          <span>ENTER THE DARKNESS</span>
+          <span>ENTER THE CITY</span>
           <ChevronDown className="w-5 h-5 animate-bounce" />
         </button>
       </div>
@@ -154,35 +158,43 @@ function StoryTimeline({ isMobile }: { isMobile: boolean }) {
   const panels = [
     {
       chapter: "01",
-      title: "THE FALL",
-      description: "Detective Marcus Cole had it all—until they took everything from him.",
-      extendedContent: "The night of December 12th changed everything. Rain hammered the warehouse windows as Cole discovered the truth about his wife's murder. The corruption ran deeper than anyone could have imagined.",
-      year: "1947",
+      title: "ROSCOE STREET",
+      description: "The night everything came apart started at a subway station he'd walked through a hundred times before.",
+      extendedContent: "Snow turning to rain over a station he knew better than his own apartment. What should have been a routine favor for an old friend became the first domino in a night that wouldn't end for three years.",
+      year: "1998",
       tags: ["origin", "tragedy"],
     },
     {
-      chapter: "02", 
-      title: "THE DESCENT",
-      description: "Three years in the bottle. Three years of forgetting. Then the letter arrived.",
-      extendedContent: "Living above Sal's Bar, Cole had become a ghost. The letter from Elena Vance pierced through the haze—someone else was asking the same questions. Someone else had lost everything.",
-      year: "1950",
-      tags: ["redemption", "mystery"],
+      chapter: "02",
+      title: "THE SUBWAY",
+      description: "Underground, off the books, and already bleeding. The tunnels don't care who you used to be.",
+      extendedContent: "Every station down was a step further from anything resembling backup. Whatever Aesir had shipped through this line, it had already reached the platforms — and the people on them.",
+      year: "1998",
+      tags: ["descent", "action"],
     },
     {
       chapter: "03",
-      title: "THE RETURN",
-      description: "Back to the streets that made him. Back to the shadows that know his name.",
-      extendedContent: "The city hadn't changed. Neither had its masters. But Cole had. Three years of rage, distilled into something colder. Something more dangerous.",
-      year: "1950",
-      tags: ["action", "revenge"],
+      title: "RAGNA ROCK",
+      description: "A nightclub that runs on two currencies: cash, and a drug called Valkyr.",
+      extendedContent: "Lupino's club, loud enough to swallow gunfire whole. Somewhere behind the bar was a name that connected a dead informant, a missing shipment, and a company that made pharmaceuticals for a living — officially.",
+      year: "1998",
+      tags: ["mystery", "action"],
     },
     {
       chapter: "04",
-      title: "THE RECKONING",
-      description: "Some debts can only be paid in blood. The city would learn to fear the night again.",
-      extendedContent: "Victor Crane's empire was built on bodies. It was time to add to the pile. But vengeance has a price, and Cole was about to learn just how much it would cost.",
-      year: "1951",
+      title: "PUNCHINELLO'S MANSION",
+      description: "Old money, old family, and a new problem it can't shoot its way out of.",
+      extendedContent: "The mob had survived worse than one angry ex-cop before. What it hadn't survived was Aesir deciding the old families were no longer useful — and Max walking in right as that decision was being made.",
+      year: "1998",
       tags: ["climax", "revenge"],
+    },
+    {
+      chapter: "05",
+      title: "THE FINAL NIGHT",
+      description: "Every thread leads to the same place. Every question gets the same answer: Nicole Horne.",
+      extendedContent: "No more middlemen, no more enforcers standing between him and the top of the chain. Just a corporation that built a drug it couldn't control, and a man with nothing left to lose finding out exactly how far up it went.",
+      year: "1998",
+      tags: ["finale", "revenge"],
     },
   ]
 
@@ -217,9 +229,9 @@ function StoryTimeline({ isMobile }: { isMobile: boolean }) {
         <div className="text-center mb-20">
           <p className="font-mono text-primary text-sm tracking-[0.3em] mb-4 uppercase">The Story</p>
           <InteractiveHeading as="h2" className="font-sans text-5xl md:text-7xl tracking-tight">
-            FOUR CHAPTERS
+            FIVE ACTS
           </InteractiveHeading>
-          <p className="font-serif text-muted-foreground italic mt-4">{"Every story has a beginning. This one starts in darkness."}</p>
+          <p className="font-serif text-muted-foreground italic mt-4">{"One bad night, stretched out over three years, and one very long walk back."}</p>
           
           {/* Active filter indicator */}
           {activeTag && (
@@ -266,6 +278,10 @@ function StoryTimeline({ isMobile }: { isMobile: boolean }) {
                 >
                   <GlitchText text={panel.title} />
                 </InteractiveChapterCard>
+                {/* Sync a real thunder strike to the two darkest turns in the story */}
+                {(panel.chapter === "03" || panel.chapter === "05") && (
+                  <StoryBeatTrigger intensity="close" />
+                )}
               </div>
             </PanelWrapper>
           ))}
@@ -288,7 +304,7 @@ function CharacterProfiles({ onHoverChange }: { onHoverChange: (hovering: boolea
         <div className="text-center mb-20">
           <p className="font-mono text-primary text-sm tracking-[0.3em] mb-4 uppercase">The Cast</p>
           <InteractiveHeading as="h2" className="font-sans text-5xl md:text-7xl tracking-tight">
-            ROGUES GALLERY
+            THE CASE FILE
           </InteractiveHeading>
           <p className="font-serif text-muted-foreground italic mt-4">
             {"Click a profile to access their classified dossier."}
@@ -319,37 +335,37 @@ function SceneTransitionSection({ isMobile }: { isMobile: boolean }) {
   }> = [
     {
       id: 1,
-      name: "THE ALLEY",
-      description: "Where it all began. Where it will all end.",
-      atmosphere: "Rain-soaked. Blood-stained. Forgotten.",
-      hoverDescription: "Dark passage behind the precinct",
+      name: "ROSCOE STREET STATION",
+      description: "Where it all fell apart. Where it will all come back to eventually.",
+      atmosphere: "Fluorescent-lit. Snow turning to rain. No way out but through.",
+      hoverDescription: "Subway station, downtown — the beginning of a very long night",
       transitionType: "iris",
       transitionLabel: "Flashback",
     },
     {
       id: 2,
-      name: "THE BLACK ROSE",
-      description: "Every secret has a price. She knows them all.",
-      atmosphere: "Smoke-filled. Jazz-soaked. Dangerous.",
-      hoverDescription: "Elena's nightclub, downtown",
+      name: "RAGNA ROCK CLUB",
+      description: "Lupino's club. Cash on one side of the bar, Valkyr on the other.",
+      atmosphere: "Smoke-filled. Bass-heavy. One wrong word from a bloodbath.",
+      hoverDescription: "Nightclub, run by Jack Lupino — Valkyr distribution point",
       transitionType: "blinds",
       transitionLabel: "Location",
     },
     {
       id: 3,
-      name: "THE TOWER",
-      description: "Crane's fortress. The belly of the beast.",
-      atmosphere: "Cold. Clinical. Corrupt.",
-      hoverDescription: "Crane Industries HQ, 42nd floor",
+      name: "AESIR CORPORATION",
+      description: "Clean carpets, quiet elevators, and a drug problem built three floors up.",
+      atmosphere: "Cold. Clinical. Every surface polished except the truth.",
+      hoverDescription: "Nicole Horne's corporate tower — the real source",
       transitionType: "smash",
       transitionLabel: "Reveal",
     },
     {
       id: 4,
-      name: "THE DOCKS",
-      description: "Where the bodies sink and the money flows.",
-      atmosphere: "Fog-bound. Salt-aired. Lawless.",
-      hoverDescription: "Harbor District, after midnight",
+      name: "PUNCHINELLO'S MANSION",
+      description: "Old family money trying to survive a war it didn't start.",
+      atmosphere: "Marble halls. Loaded guns. A family running out of time.",
+      hoverDescription: "The Punchinello estate — the old guard's last stand",
       transitionType: "burn",
       transitionLabel: "Time Skip",
     },
@@ -503,11 +519,11 @@ function Footer() {
           {/* Logo */}
           <div>
             <h3 className="font-sans text-4xl mb-4">
-              <InteractiveTitle text="NOIR" />
-              <span className="text-primary"><InteractiveTitle text="CITY" /></span>
+              <InteractiveTitle text="MAX" />
+              <span className="text-primary"><InteractiveTitle text="PAYNE" /></span>
             </h3>
             <p className="font-serif text-muted-foreground italic">
-              A descent into darkness.
+              A tribute, not a copy.
             </p>
           </div>
 
@@ -536,22 +552,34 @@ function Footer() {
               Credits
             </h4>
             <p className="font-mono text-sm text-muted-foreground">
-              An interactive experience
+              An unofficial fan project
               <br />
-              Inspired by the classics
+              Built by an admirer of the original
               <br />
-              <span className="text-primary">2024 Noir City</span>
+              <span className="text-primary">Not for sale, not for profit</span>
             </p>
           </div>
         </div>
 
+        {/* Disclaimer */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <p className="font-mono text-[11px] leading-relaxed text-muted-foreground/70 max-w-3xl">
+            This is an unofficial, non-commercial fan tribute inspired by Max Payne (2001).
+            It is not affiliated with, endorsed by, or sponsored by Remedy Entertainment,
+            Rockstar Games, or Take-Two Interactive. Max Payne and all related characters,
+            names, and marks are trademarks of their respective owners. All narration,
+            dialogue, and evidence text on this site is original writing created for this
+            tribute, not reproduced from the game.
+          </p>
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-8 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="font-mono text-xs text-muted-foreground tracking-widest">
-            THE NIGHT IS DARKEST JUST BEFORE THE DAWN
+            NEW YORK, 1998 — SOME NIGHTS DON'T END WHEN THE SUN COMES UP
           </p>
           <p className="font-mono text-xs text-muted-foreground">
-            Built with darkness and determination
+            Built with rain and determination
           </p>
         </div>
       </div>
@@ -594,8 +622,8 @@ export default function NoirCityPage() {
       {/* Custom cursor system - disabled on mobile */}
       {!isMobile && <NoirCursor />}
       
-      {/* Multi-layer parallax with rain and lightning */}
-      <ParallaxSystem performanceMode={performanceMode} />
+      {/* Multi-layer parallax with rain and lightning — storm escalates with scroll progress */}
+      <ParallaxSystem performanceMode={performanceMode} stormIntensity={scrollProgress} />
       
       {/* Optimized film grain */}
       <OptimizedFilmGrain performanceMode={performanceMode} />
@@ -610,18 +638,24 @@ export default function NoirCityPage() {
 
       {/* Page sections */}
       <HeroSection />
+
+      {/* First storm beat — distant, just atmosphere, right as the story proper begins */}
+      <StoryBeatTrigger intensity="distant" />
       
       <InteractiveQuote 
-        quote="The rain never stops in this city. It's like God himself is trying to wash away the sins. He's gonna need a bigger flood."
-        author="Marcus Cole"
+        quote="The rain in this city doesn't wash anything clean. It just makes the blood easier to miss."
+        author="Max Payne"
       />
       
       <StoryTimeline isMobile={isMobile} />
       
       <InteractiveQuote 
-        quote="In noir, there are no heroes. Just survivors and corpses."
+        quote="Everybody in this story thinks they're the one telling it. Most of them are wrong."
         author="The Narrator"
       />
+
+      {/* Close strike — the interrogation room is where the night turns */}
+      <StoryBeatTrigger intensity="close" />
 
       {/* Interrogation minigame between story chapters */}
       <InterrogationSection onComplete={handleInterrogationComplete} />
@@ -631,8 +665,8 @@ export default function NoirCityPage() {
       <SceneTransitionSection isMobile={isMobile} />
       
       <InteractiveQuote 
-        quote="Everyone has a breaking point. I found mine three years ago. Now I break other people instead."
-        author="Marcus Cole"
+        quote="I used to think there was a version of this where I got to stop. There isn't. There's just the next name on the list."
+        author="Max Payne"
       />
       
       <Footer />
