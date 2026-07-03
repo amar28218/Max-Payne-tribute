@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StoryBeatTrigger } from "@/components/noir/story-beat-trigger"
+import { DistrictAnchor } from "@/components/noir/district-anchor"
+import { DistrictRail } from "@/components/noir/district-rail"
 import { BootSequence } from "@/components/noir/boot-sequence"
 import { NoirCursor } from "@/components/noir/cursor-system"
 import { TiltCard } from "@/components/noir/tilt-card"
@@ -92,6 +94,9 @@ const CHARACTERS: Character[] = [
     redactedWords: ["ragna", "valkyr", "angels"],
   },
 ]
+
+// Ordered districts for the rail nav — must match the order <DistrictAnchor> markers appear down the page
+const DISTRICTS = ["ROSCOE STREET", "SUBWAY", "RAGNA ROCK", "PUNCHINELLO'S MANSION", "THE FINAL NIGHT"]
 
 // Hero section with interactive elements
 function HeroSection() {
@@ -621,6 +626,9 @@ export default function NoirCityPage() {
 
       {/* Custom cursor system - disabled on mobile */}
       {!isMobile && <NoirCursor />}
+
+      {/* District rail nav - desktop only */}
+      <DistrictRail districts={DISTRICTS} scrollProgress={scrollProgress} />
       
       {/* Multi-layer parallax with rain and lightning — storm escalates with scroll progress */}
       <ParallaxSystem performanceMode={performanceMode} stormIntensity={scrollProgress} />
@@ -639,6 +647,8 @@ export default function NoirCityPage() {
       {/* Page sections */}
       <HeroSection />
 
+      <DistrictAnchor district="ROSCOE STREET" />
+
       {/* First storm beat — distant, just atmosphere, right as the story proper begins */}
       <StoryBeatTrigger intensity="distant" />
       
@@ -646,6 +656,8 @@ export default function NoirCityPage() {
         quote="The rain in this city doesn't wash anything clean. It just makes the blood easier to miss."
         author="Max Payne"
       />
+
+      <DistrictAnchor district="SUBWAY" />
       
       <StoryTimeline isMobile={isMobile} />
       
@@ -654,6 +666,8 @@ export default function NoirCityPage() {
         author="The Narrator"
       />
 
+      <DistrictAnchor district="RAGNA ROCK" />
+
       {/* Close strike — the interrogation room is where the night turns */}
       <StoryBeatTrigger intensity="close" />
 
@@ -661,8 +675,12 @@ export default function NoirCityPage() {
       <InterrogationSection onComplete={handleInterrogationComplete} />
       
       <CharacterProfiles onHoverChange={setIsHoveringCharacter} />
+
+      <DistrictAnchor district="PUNCHINELLO'S MANSION" />
       
       <SceneTransitionSection isMobile={isMobile} />
+
+      <DistrictAnchor district="THE FINAL NIGHT" />
       
       <InteractiveQuote 
         quote="I used to think there was a version of this where I got to stop. There isn't. There's just the next name on the list."
