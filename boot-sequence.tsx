@@ -4,16 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { sfx } from "@/lib/sfx-manager"
 
-/**
- * ===========================================================================
- * EDIT ME — narration lines
- * ===========================================================================
- * These are placeholders. Replace with your own chosen lines — Claude does
- * not generate the game's original script text here (see project plan for
- * why). Keep each line short (under ~90 characters) so the typewriter
- * timing below still reads comfortably on mobile.
- * ===========================================================================
- */
 const BOOT_LINES = [
   "They were all dead.",
   "The Final gunshot was an exclamation mark to everything.....",
