@@ -1,40 +1,26 @@
-# Max Payne (2001) Tribute Website
+# Audio files needed
 
-An unofficial, non-commercial tribute website celebrating the atmosphere, storytelling, and noir aesthetics of Max Payne (2001).
+The boot sequence and SFX system (`lib/sfx-manager.ts`) look for these files.
+None are included — the site works fine without them (sounds just silently
+no-op), but add them here for the full experience. All filenames must match
+exactly.
 
-This project was created as a personal web development and portfolio project to explore interactive storytelling, visual design, and immersive web experiences inspired by one of the most influential noir action games ever made.
+| File | Used for | Length/type |
+|---|---|---|
+| `thunder-crack.mp3` | Boot sequence entry | One-shot, 1-3s |
+| `rain-loop.mp3` | Ambient bed, boot + background | Seamless loop, 10-30s |
+| `typewriter-key.mp3` | Boot narration typing | One-shot, very short (~80-120ms) |
+| `vhs-glitch.mp3` | Boot -> hero transition | One-shot, 0.5-1s, noisy/static |
+| `page-turn.mp3` | Chapter transitions (Phase 5+) | One-shot, 0.3-0.8s |
+| `heartbeat.mp3` | Bullet-time interaction (Phase 6) | One-shot, 1-2s |
+| `ambient-jazz.mp3` | Optional low-volume music bed | Seamless loop, 30s+ |
 
-# Features
+## Free, legal sources (royalty-free / CC0)
 
-- Noir-inspired visual design
-- Interactive storytelling elements
-- Atmospheric presentation
-- Single-page immersive experience
-- Responsive design
-- Hosted on Vercel
+- **Pixabay Audio** (pixabay.com/sound-effects) — no attribution required, good rain/thunder/static selection.
+- **Freesound.org** — filter search results to the "CC0" license specifically (other Freesound licenses require attribution).
+- **Zapsplat** (zapsplat.com) — free tier requires a free account + attribution unless you're on a paid plan.
 
-# Technologies Used
+Search terms that work well: "thunder crack", "heavy rain loop", "typewriter key single", "VHS static glitch", "film reel page turn", "heartbeat slow tense", "noir jazz saxophone loop".
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Vercel
-
-# Purpose
-
-This project was created for:
-- Educational purposes
-- Personal learning
-- Portfolio demonstration
-- Appreciation of Max Payne's artistic direction
-
-# Disclaimer
-
-Max Payne and all associated characters, names, music, logos, artwork, and trademarks are the property of their respective owners, including Remedy Entertainment and Rockstar Games.
-
-This is an unofficial, non-commercial fan tribute project created solely for educational and portfolio purposes. This project is not affiliated with, endorsed by, or sponsored by Remedy Entertainment or Rockstar Games.
-
-## Author
-
-Created by **Amar Veer Yadav**
+Keep total file size reasonable (all files under ~5MB combined ideally) since Vercel's free tier has a bandwidth cap — mp3 at 128kbps is plenty for ambience/SFX at this scale.
