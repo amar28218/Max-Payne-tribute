@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { sfx } from "@/lib/sfx-manager"
 import { onLightningStrike, type LightningIntensity } from "@/lib/story-beats"
+import { onBulletTime, BULLET_TIME_ONSET_MS, BULLET_TIME_HOLD_MS } from "@/lib/bullet-time"
 
 interface ParallaxSystemProps {
   performanceMode: boolean
@@ -141,6 +142,22 @@ export function ParallaxSystem({ performanceMode, stormIntensity = 0 }: Parallax
     })
   }, [flicker])
 
+  const [rainSlowFactor, setRainSlowFactor] = useState(1)
+  const bulletTimeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  // Bullet time genuinely slows the rain — rather than faking "slow motion"
+  // purely with an overlay, the one system we fully control (rain fall
+  // speed) actually retimes for the duration of the effect.
+  useEffect(() => {
+    return onBulletTime(() => {
+      if (bulletTimeTimeoutRef.current) clearTimeout(bulletTimeTimeoutRef.current)
+      setRainSlowFactor(3.2)
+      bulletTimeTimeoutRef.current = setTimeout(() => {
+        setRainSlowFactor(1)
+      }, BULLET_TIME_ONSET_MS + BULLET_TIME_HOLD_MS)
+    })
+  }, [])
+
   const layers = performanceMode ? 2 : 4
   const rainOpacity = 0.75 + stormIntensity * 0.5 // drizzle -> heavier downpour as the story darkens
   const surgeVisible = stormIntensity > 0.55
@@ -220,7 +237,7 @@ export function ParallaxSystem({ performanceMode, stormIntensity = 0 }: Parallax
                 width: `${drop.thickness}px`,
                 height: `${drop.height}px`,
                 background: `linear-gradient(${drop.angle}deg, transparent, rgba(255, 255, 255, ${drop.opacity}))`,
-                animationDuration: `${drop.speed}s`,
+                animationDuration: `${drop.speed * rainSlowFactor}s`,
                 animationDelay: `${Math.random() * 3}s`,
                 transform: `rotate(${90 - drop.angle}deg) translateX(${drop.drift * 10}px)`,
                 ["--rain-drift" as string]: `${drop.drift}px`,
@@ -253,7 +270,7 @@ export function ParallaxSystem({ performanceMode, stormIntensity = 0 }: Parallax
                 width: `${Math.max(0.5, drop.thickness - 0.5)}px`,
                 height: `${drop.height * 1.4}px`,
                 background: `linear-gradient(${drop.angle}deg, transparent, rgba(200, 210, 255, ${drop.opacity * 0.8}))`,
-                animationDuration: `${drop.speed * 0.6}s`, // faster fall = harder rain
+                animationDuration: `${drop.speed * 0.6 * rainSlowFactor}s`, // faster fall = harder rain
                 animationDelay: `${Math.random() * 2}s`,
                 transform: `rotate(${90 - drop.angle}deg) translateX(${drop.drift * 10}px)`,
               }}

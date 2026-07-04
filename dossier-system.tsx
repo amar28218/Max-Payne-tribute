@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { X, Eye, EyeOff, Lock } from "lucide-react"
 import { useEscapeDismiss } from "@/components/noir/interactions"
+import { triggerBulletTime } from "@/lib/bullet-time"
+import { triggerFlashback } from "@/lib/flashback"
 
 export interface Character {
   id: string
@@ -420,11 +422,21 @@ export function DetectiveDossier({ characters, onProgressChange }: DossierSystem
     const key = `${charId}-evidence-${evidenceIndex}`
     setRevealedEvidence(prev => new Set([...prev, key]))
     setDiscoveredLore(prev => new Set([...prev, key]))
+    // Easter egg: Mona's rifle scope is the one piece of evidence in the
+    // whole case file that's explicitly a weapon — reveal it, get bullet time.
+    if (charId === "mona" && evidenceIndex === 0) {
+      triggerBulletTime()
+    }
   }, [])
 
   const handleWordReveal = useCallback((word: string) => {
     const key = `word-${word.toLowerCase()}`
     setDiscoveredLore(prev => new Set([...prev, key]))
+    // Max's family are the two redacted words that matter most to him —
+    // revealing either one triggers the flashback treatment.
+    if (["michelle", "rose"].includes(word.toLowerCase())) {
+      triggerFlashback()
+    }
   }, [])
 
   const getCurrentQuote = (char: Character) => {

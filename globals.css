@@ -449,10 +449,60 @@
   animation: chromatic-flicker 2.4s ease-in-out infinite;
 }
 
+/* ===== Phase 6: Bullet time ===== */
+
+@keyframes bullet-time-stutter {
+  0%, 100% { opacity: 0; }
+  20%, 60% { opacity: 1; }
+  40% { opacity: 0.3; }
+}
+
+@keyframes shell-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  8% { opacity: 1; }
+  100% {
+    transform: translateY(70vh) translateX(var(--shell-drift, 20px)) rotate(var(--shell-rotation, 180deg));
+    opacity: 0.15;
+  }
+}
+
+.animate-shell-fall {
+  animation-name: shell-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+
+@keyframes bullet-time-gauge {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* ===== Phase 6: Flashback ===== */
+
+@keyframes flashback-glitch-slice {
+  0%, 92%, 100% { transform: translateX(0); }
+  93% { transform: translateX(-1.5%); }
+  94% { transform: translateX(1%); }
+  95% { transform: translateX(-0.5%); }
+  96% { transform: translateX(0.8%); }
+  97% { transform: translateX(0); }
+}
+
+.animate-flashback-glitch {
+  animation: flashback-glitch-slice 2.4s ease-in-out infinite;
+}
+
+/* Permanent subtle flashback framing for the Roscoe Street scene card */
+.flashback-frame {
+  filter: saturate(0.55) sepia(0.12) hue-rotate(170deg) brightness(0.95) contrast(1.08);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-boot-flash,
-  .animate-vhs-glitch,
-  .animate-chromatic-flicker {
+  .animate-shell-fall,
+  .animate-flashback-glitch {
     animation: none !important;
   }
 }

@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils"
 import { StoryBeatTrigger } from "@/components/noir/story-beat-trigger"
 import { DistrictAnchor } from "@/components/noir/district-anchor"
 import { DistrictRail } from "@/components/noir/district-rail"
+import { BulletTimeOverlay } from "@/components/noir/bullet-time-overlay"
+import { FlashbackOverlay } from "@/components/noir/flashback-overlay"
+import { triggerBulletTime } from "@/lib/bullet-time"
 import { BootSequence } from "@/components/noir/boot-sequence"
 import { NoirCursor } from "@/components/noir/cursor-system"
 import { TiltCard } from "@/components/noir/tilt-card"
@@ -138,13 +141,23 @@ function HeroSection() {
         </p>
 
         {/* CTA */}
-        <button 
-          className="group relative inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg tracking-widest transition-all duration-300 hover:shadow-[0_0_30px_rgba(220,38,38,0.4)]"
-          data-clickable
-        >
-          <span>ENTER THE CITY</span>
-          <ChevronDown className="w-5 h-5 animate-bounce" />
-        </button>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <button 
+            className="group relative inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg tracking-widest transition-all duration-300 hover:shadow-[0_0_30px_rgba(220,38,38,0.4)]"
+            data-clickable
+          >
+            <span>ENTER THE CITY</span>
+            <ChevronDown className="w-5 h-5 animate-bounce" />
+          </button>
+          <button
+            onClick={() => triggerBulletTime()}
+            className="inline-flex items-center gap-2 border border-border hover:border-primary text-muted-foreground hover:text-primary px-6 py-4 text-sm tracking-[0.2em] uppercase transition-all duration-300"
+            data-clickable
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+            Slow Time
+          </button>
+        </div>
       </div>
 
       {/* Interactive scroll indicator */}
@@ -287,6 +300,19 @@ function StoryTimeline({ isMobile }: { isMobile: boolean }) {
                 {(panel.chapter === "03" || panel.chapter === "05") && (
                   <StoryBeatTrigger intensity="close" />
                 )}
+                {/* The climax gets the signature bullet-time moment */}
+                {panel.chapter === "05" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      triggerBulletTime()
+                    }}
+                    className="mt-3 inline-flex items-center gap-2 font-mono text-xs tracking-[0.2em] uppercase text-primary/80 hover:text-primary border-b border-primary/30 hover:border-primary pb-0.5 transition-colors"
+                    data-clickable
+                  >
+                    ● Relive the moment
+                  </button>
+                )}
               </div>
             </PanelWrapper>
           ))}
@@ -415,7 +441,10 @@ function SceneTransitionSection({ isMobile }: { isMobile: boolean }) {
         </div>
 
         {/* Scene display */}
-        <div className="relative aspect-[21/9] comic-panel bg-card overflow-hidden mb-8">
+        <div className={cn(
+          "relative aspect-[21/9] comic-panel bg-card overflow-hidden mb-8 transition-[filter] duration-700",
+          activeScene === 0 && "flashback-frame"
+        )}>
           {/* Scene background */}
           <div className={cn(
             "absolute inset-0 transition-opacity duration-500",
@@ -455,6 +484,11 @@ function SceneTransitionSection({ isMobile }: { isMobile: boolean }) {
               {scenes[activeScene].atmosphere}
             </p>
           </div>
+
+          {/* Extra scanline texture while the flashback scene is active */}
+          {activeScene === 0 && (
+            <div className="absolute inset-0 z-30 pointer-events-none vhs-scanlines opacity-60" />
+          )}
         </div>
 
         {/* Scene selector with context menus */}
@@ -623,6 +657,8 @@ export default function NoirCityPage() {
   return (
     <main className="relative min-h-screen bg-background text-foreground">
       <BootSequence onComplete={() => setBootComplete(true)} />
+      <BulletTimeOverlay />
+      <FlashbackOverlay />
 
       {/* Custom cursor system - disabled on mobile */}
       {!isMobile && <NoirCursor />}
