@@ -27,7 +27,6 @@ type SfxName =
   | "pageTurn"
   | "heartbeat"
   | "ambientJazz"
-  | "flashbackEcho"
 
 interface SfxDefinition {
   src: string
@@ -43,7 +42,6 @@ const SFX_MAP: Record<SfxName, SfxDefinition> = {
   pageTurn: { src: "/audio/page-turn.mp3", volume: 0.4 },
   heartbeat: { src: "/audio/heartbeat.mp3", volume: 0.55 },
   ambientJazz: { src: "/audio/ambient-jazz.mp3", loop: true, volume: 0.25 },
-  flashbackEcho: { src: "/audio/flashback-echo.mp3", volume: 0.45 },
 }
 
 class SfxManager {
